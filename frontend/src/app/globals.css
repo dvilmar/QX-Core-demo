@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+:root {
+  --bg:            #0a0a0a;
+  --bg-card:       #141414;
+  --bg-card-hover: #1c1c1c;
+  --border:        #1e1e1e;
+  --border-hover:  #2a2a2a;
+  --text:          #e8e8e8;
+  --text-dim:      #737373;
+  --text-muted:    #404040;
+  --green:         #00b894;
+  --green-bg:      rgba(0, 184, 148, 0.08);
+  --red:           #ff6b6b;
+  --red-bg:        rgba(255, 107, 107, 0.08);
+  --yellow:        #f0a500;
+  --yellow-bg:     rgba(240, 165, 0, 0.08);
+}
+
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.tabular-nums { font-variant-numeric: tabular-nums; }
+
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; border: 3px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
+* { scrollbar-width: auto; scrollbar-color: var(--border) transparent; }
+
+button, a, label, select, input[type="checkbox"], input[type="radio"], summary, [role="button"], [role="tab"] {
+  cursor: pointer;
+}
+button:disabled, button[disabled] {
+  cursor: not-allowed;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
