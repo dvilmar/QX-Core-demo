@@ -78,3 +78,7 @@ docker-compose.yml
   library, not a toy canvas implementation.
 - A containerized, multi-service local dev/deploy setup with multi-stage
   Docker builds.
+
+## License
+
+[MIT](./LICENSE)
