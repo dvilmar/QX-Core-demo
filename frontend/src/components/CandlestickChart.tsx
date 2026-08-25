@@ -11,23 +11,29 @@ export default function CandlestickChart({ candles }: { candles: Candle[] }) {
   useEffect(() => {
     if (!containerRef.current) return;
     const chart = createChart(containerRef.current, {
-      layout: { background: { color: "#141414" }, textColor: "#a0a0a0" },
-      grid: {
-        vertLines: { color: "#1e1e1e" },
-        horzLines: { color: "#1e1e1e" },
+      layout: {
+        background: { color: "transparent" },
+        textColor: "#948a76",
+        fontFamily: "var(--font-mono)",
+        fontSize: 11,
       },
-      timeScale: { timeVisible: true, secondsVisible: false },
+      grid: {
+        vertLines: { color: "#221d16" },
+        horzLines: { color: "#221d16" },
+      },
+      timeScale: { timeVisible: true, secondsVisible: false, borderColor: "#221d16" },
+      rightPriceScale: { borderColor: "#221d16" },
       height: 360,
       autoSize: true,
     });
     chartRef.current = chart;
 
     const series = chart.addSeries(CandlestickSeries, {
-      upColor: "#00b894",
-      downColor: "#ff6b6b",
+      upColor: "#3ecf8e",
+      downColor: "#ef6a5c",
       borderVisible: false,
-      wickUpColor: "#00b894",
-      wickDownColor: "#ff6b6b",
+      wickUpColor: "#3ecf8e",
+      wickDownColor: "#ef6a5c",
     });
 
     series.setData(

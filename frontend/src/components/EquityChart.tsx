@@ -10,21 +10,27 @@ export default function EquityChart({ values, timestamps }: { values: number[]; 
   useEffect(() => {
     if (!containerRef.current) return;
     const chart = createChart(containerRef.current, {
-      layout: { background: { color: "#141414" }, textColor: "#a0a0a0" },
-      grid: {
-        vertLines: { color: "#1e1e1e" },
-        horzLines: { color: "#1e1e1e" },
+      layout: {
+        background: { color: "transparent" },
+        textColor: "#948a76",
+        fontFamily: "var(--font-mono)",
+        fontSize: 11,
       },
-      timeScale: { timeVisible: true, secondsVisible: false },
+      grid: {
+        vertLines: { color: "#221d16" },
+        horzLines: { color: "#221d16" },
+      },
+      timeScale: { timeVisible: true, secondsVisible: false, borderColor: "#221d16" },
+      rightPriceScale: { borderColor: "#221d16" },
       height: 260,
       autoSize: true,
     });
     chartRef.current = chart;
 
     const series = chart.addSeries(AreaSeries, {
-      lineColor: "#00b894",
-      topColor: "rgba(0, 184, 148, 0.28)",
-      bottomColor: "rgba(0, 184, 148, 0.02)",
+      lineColor: "#d9a54a",
+      topColor: "rgba(217, 165, 74, 0.30)",
+      bottomColor: "rgba(217, 165, 74, 0.02)",
       lineWidth: 2,
     });
 

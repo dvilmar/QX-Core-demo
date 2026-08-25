@@ -19,14 +19,14 @@ export default function BacktestLab() {
   const [error, setError] = useState<string | null>(null);
 
   const field = (key: keyof BacktestParams, label: string, step: number) => (
-    <label className="flex flex-col gap-1 text-xs text-[var(--text-dim)]">
+    <label className="flex flex-col gap-1.5 text-xs text-[var(--text-dim)] font-medium">
       {label}
       <input
         type="number"
         step={step}
         value={params[key]}
         onChange={(e) => setParams((p) => ({ ...p, [key]: Number(e.target.value) }))}
-        className="bg-[#0a0a0a] border border-[var(--border)] rounded-md px-2.5 py-1.5 text-sm text-[var(--text)] tabular-nums"
+        className="bg-[var(--bg)] border border-[var(--border)] rounded-lg px-2.5 py-1.5 text-sm text-[var(--text)] tabular-nums transition-colors focus:border-[var(--accent)] outline-none"
       />
     </label>
   );
@@ -58,10 +58,8 @@ export default function BacktestLab() {
   }
 
   return (
-    <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-lg p-4 space-y-4">
-      <div className="text-xs uppercase tracking-widest text-[var(--text-dim)] font-medium">
-        Backtest Lab — run the demo strategy with custom parameters
-      </div>
+    <div className="panel p-4 space-y-4">
+      <div className="eyebrow">Backtest Lab — run the demo strategy with custom parameters</div>
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         {field("capital", "Capital ($)", 1000)}
         {field("risk_per_trade", "Risk / Trade", 0.01)}
@@ -72,7 +70,7 @@ export default function BacktestLab() {
       <button
         onClick={run}
         disabled={running}
-        className="bg-[var(--green-bg)] text-[var(--green)] border border-[var(--green)]/30 rounded-md px-4 py-2 text-sm font-medium hover:bg-[var(--green)]/15 transition-colors disabled:opacity-50"
+        className="bg-[var(--accent-bg)] text-[var(--accent-strong)] border border-[var(--accent)]/30 rounded-lg px-4 py-2 text-sm font-semibold hover:bg-[var(--accent)]/20 transition-colors disabled:opacity-50"
       >
         {running ? "Running…" : "Run Backtest"}
       </button>

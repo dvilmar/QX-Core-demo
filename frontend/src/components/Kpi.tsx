@@ -1,10 +1,17 @@
 type Tone = "neutral" | "green" | "red" | "yellow";
 
-const TONE_CLASSES: Record<Tone, string> = {
-  neutral: "text-[#e8e8e8]",
+const TONE_TEXT: Record<Tone, string> = {
+  neutral: "text-[var(--text)]",
   green: "text-[var(--green)]",
   red: "text-[var(--red)]",
-  yellow: "text-[var(--yellow)]",
+  yellow: "text-[var(--accent-strong)]",
+};
+
+const TONE_STRIPE: Record<Tone, string> = {
+  neutral: "bg-[var(--border-hover)]",
+  green: "bg-[var(--green)]",
+  red: "bg-[var(--red)]",
+  yellow: "bg-[var(--accent)]",
 };
 
 export default function Kpi({
@@ -19,12 +26,11 @@ export default function Kpi({
   tone?: Tone;
 }) {
   return (
-    <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-lg p-4">
-      <div className="text-[11px] uppercase tracking-widest text-[var(--text-dim)] font-medium mb-1.5">
-        {label}
-      </div>
-      <div className={`text-2xl font-semibold tabular-nums ${TONE_CLASSES[tone]}`}>{value}</div>
-      {sub && <div className="text-xs text-[var(--text-muted)] mt-1">{sub}</div>}
+    <div className="panel relative overflow-hidden p-4 transition-colors">
+      <span className={`absolute left-0 top-0 h-full w-[3px] ${TONE_STRIPE[tone]}`} />
+      <div className="eyebrow mb-2">{label}</div>
+      <div className={`font-mono text-2xl font-medium tabular-nums ${TONE_TEXT[tone]}`}>{value}</div>
+      {sub && <div className="text-xs text-[var(--text-muted)] mt-1.5">{sub}</div>}
     </div>
   );
 }

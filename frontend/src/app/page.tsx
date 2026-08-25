@@ -46,10 +46,20 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="min-h-screen p-6 max-w-6xl mx-auto space-y-4">
-      <header className="space-y-1">
-        <h1 className="text-xl font-semibold">Algo Trading Dashboard</h1>
-        <p className="text-sm text-[var(--text-dim)]">
+    <div className="min-h-screen px-6 py-8 max-w-6xl mx-auto space-y-5">
+      <header className="flex flex-col gap-3 pb-2 border-b border-[var(--border)]">
+        <div className="flex items-baseline gap-3">
+          <span
+            aria-hidden
+            className="font-display italic text-2xl text-[var(--accent)] leading-none select-none"
+          >
+            Q
+          </span>
+          <h1 className="font-display text-2xl md:text-[28px] leading-none text-[var(--text)]">
+            Algo Trading Dashboard
+          </h1>
+        </div>
+        <p className="text-sm text-[var(--text-dim)] max-w-2xl">
           Full-stack demo (FastAPI + Next.js + Docker) backed by synthetic market data and a simple
           illustrative EMA-crossover signal — not a real trading strategy or live exchange connection.
         </p>
@@ -57,13 +67,15 @@ export default function Dashboard() {
 
       <StatusBar connected={connected} lastPrice={snapshot?.last_price ?? null} />
 
-      <div className="flex gap-1 bg-[var(--bg-card)] border border-[var(--border)] rounded-lg p-1 w-fit">
+      <div className="flex gap-1 panel p-1 w-fit">
         {(["dashboard", "lab"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`px-3 py-1.5 rounded-md text-xs font-medium capitalize transition-colors ${
-              tab === t ? "bg-[var(--green-bg)] text-[var(--green)]" : "text-[var(--text-dim)] hover:text-[var(--text)]"
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold capitalize transition-colors ${
+              tab === t
+                ? "bg-[var(--accent-bg)] text-[var(--accent-strong)]"
+                : "text-[var(--text-dim)] hover:text-[var(--text)]"
             }`}
           >
             {t}
@@ -72,7 +84,7 @@ export default function Dashboard() {
       </div>
 
       {tab === "dashboard" && snapshot && (
-        <div className="space-y-4">
+        <div className="space-y-5">
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             <Kpi label="Equity" value={`$${snapshot.equity.toFixed(2)}`} />
             <Kpi label="Trades" value={String(snapshot.metrics.total_trades)} />
@@ -86,16 +98,12 @@ export default function Dashboard() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-lg p-4">
-              <div className="text-xs uppercase tracking-widest text-[var(--text-dim)] font-medium mb-3">
-                Price
-              </div>
+            <div className="panel p-4">
+              <div className="eyebrow mb-3">Price</div>
               {candles.length > 0 && <CandlestickChart candles={candles} />}
             </div>
-            <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-lg p-4">
-              <div className="text-xs uppercase tracking-widest text-[var(--text-dim)] font-medium mb-3">
-                Equity Curve
-              </div>
+            <div className="panel p-4">
+              <div className="eyebrow mb-3">Equity Curve</div>
               {snapshot.equity_curve.length > 0 && (
                 <EquityChart values={snapshot.equity_curve} timestamps={snapshot.equity_timestamps} />
               )}
@@ -108,7 +116,7 @@ export default function Dashboard() {
 
       {tab === "lab" && <BacktestLab />}
 
-      <footer className="text-xs text-[var(--text-muted)] pt-4">
+      <footer className="text-xs text-[var(--text-muted)] pt-4 pb-2">
         Portfolio demo project. Synthetic data, no real market or brokerage connection.
       </footer>
     </div>
