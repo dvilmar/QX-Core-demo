@@ -1,4 +1,4 @@
-# Algo Trading Dashboard (Demo)
+# QX-Core (Demo)
 
 A full-stack dashboard for a systematic trading system: FastAPI backend,
 Next.js/TypeScript frontend, Docker Compose deployment, live WebSocket
