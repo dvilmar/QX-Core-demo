@@ -8,13 +8,15 @@ import CandlestickChart from "@/components/CandlestickChart";
 import EquityChart from "@/components/EquityChart";
 import TradesTable from "@/components/TradesTable";
 import BacktestLab from "@/components/BacktestLab";
+import ValidationLab from "@/components/ValidationLab";
+import LoginGate from "@/components/LoginGate";
 
-export default function Dashboard() {
+function Dashboard() {
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [candles, setCandles] = useState<Candle[]>([]);
   const [trades, setTrades] = useState<Trade[]>([]);
   const [connected, setConnected] = useState(false);
-  const [tab, setTab] = useState<"dashboard" | "lab">("dashboard");
+  const [tab, setTab] = useState<"dashboard" | "lab" | "validation">("dashboard");
   const wsRef = useRef<WebSocket | null>(null);
 
   const loadInitial = useCallback(async () => {
@@ -68,7 +70,7 @@ export default function Dashboard() {
       <StatusBar connected={connected} lastPrice={snapshot?.last_price ?? null} />
 
       <div className="flex gap-1 panel p-1 w-fit">
-        {(["dashboard", "lab"] as const).map((t) => (
+        {(["dashboard", "lab", "validation"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -116,9 +118,19 @@ export default function Dashboard() {
 
       {tab === "lab" && <BacktestLab />}
 
+      {tab === "validation" && <ValidationLab />}
+
       <footer className="text-xs text-[var(--text-muted)] pt-4 pb-2">
         Portfolio demo project. Synthetic data, no real market or brokerage connection.
       </footer>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <LoginGate>
+      <Dashboard />
+    </LoginGate>
   );
 }

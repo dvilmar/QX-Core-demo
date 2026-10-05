@@ -1,29 +1,20 @@
-"""
-Synthetic market data + a small, intentionally simple demo trading signal.
-
-This is NOT the author's real trading strategy — it exists only to give the
-dashboard something real to display (price series, positions, trades,
-equity curve, backtest results) without depending on any proprietary logic
-or real market data. Signal: a plain EMA20/EMA50 crossover with an RSI
-filter, the textbook baseline everyone starts from, deliberately unremarkable.
-
-Price data is generated with a seeded geometric Brownian motion (GBM) walk
-so the whole app is fully self-contained and reproducible — no exchange
-API keys, no external network calls, no rate limits.
-"""
+"""Synthetic data and a deliberately simple EMA/RSI demo signal; not a real strategy."""
 
 from __future__ import annotations
 
 import math
 import random
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
+
+from quant import costs
 
 BAR_HOURS = 1
-DEFAULT_BARS = 24 * 365  # ~1 year of hourly bars
+DEFAULT_BARS = 24 * 365
 DEFAULT_CAPITAL = 10_000.0
 RISK_PER_TRADE = 0.02
-FEE_RATE = 0.001
+FEE_RATE = costs.FEE_RATE
+ATR_PERIOD = 14
 
 
 @dataclass
@@ -63,21 +54,19 @@ def generate_synthetic_candles(
     annual_drift: float = 0.15,
     annual_vol: float = 0.55,
 ) -> list[Candle]:
-    """Seeded GBM random walk resampled into hourly OHLC bars — looks like a
-    real, moderately volatile risk asset without being tied to any real
-    market or provider."""
+    """Seeded GBM random walk resampled into hourly OHLC bars."""
     rng = random.Random(seed)
     dt = 1.0 / (24 * 365)
     mu = annual_drift
     sigma = annual_vol
     price = start_price
-    start_ts = datetime.now(tz=timezone.utc) - timedelta(hours=n_bars)
+    start_ts = datetime.now(tz=UTC) - timedelta(hours=n_bars)
 
     candles: list[Candle] = []
     for i in range(n_bars):
         ts = start_ts + timedelta(hours=i)
         open_price = price
-        # a few sub-steps per bar so high/low aren't just open/close
+
         sub_prices = [open_price]
         for _ in range(4):
             shock = rng.gauss(0, 1)
@@ -102,8 +91,6 @@ def _ema(values: list[float], period: int) -> list[float]:
 
 
 def _rsi(values: list[float], period: int = 14) -> list[float]:
-    """Simple rolling-window RSI (recomputed per bar — dataset here is small
-    enough that clarity beats the Wilder-smoothing micro-optimization)."""
     out = [50.0] * len(values)
     for i in range(period, len(values)):
         window = values[i - period : i + 1]
@@ -111,6 +98,16 @@ def _rsi(values: list[float], period: int = 14) -> list[float]:
         avg_gain = sum(d for d in deltas if d > 0) / period
         avg_loss = abs(sum(d for d in deltas if d < 0)) / period
         out[i] = 100.0 if avg_loss == 0 else 100 - 100 / (1 + avg_gain / avg_loss)
+    return out
+
+
+def _atr(candles: list[Candle], period: int = ATR_PERIOD) -> list[float | None]:
+    tr = [candles[0].high - candles[0].low]
+    for prev, c in zip(candles, candles[1:], strict=False):
+        tr.append(max(c.high - c.low, abs(c.high - prev.close), abs(c.low - prev.close)))
+    out: list[float | None] = [None] * len(candles)
+    for i in range(period - 1, len(candles)):
+        out[i] = sum(tr[i - period + 1 : i + 1]) / period
     return out
 
 
@@ -122,12 +119,12 @@ def run_demo_backtest(
     ema_slow: int = 50,
     rsi_period: int = 14,
 ) -> BacktestResult:
-    """EMA fast/slow crossover, long-only, RSI>50 filter, ATR-ish stop via
-    a fixed % — deliberately simple, illustrative-only demo logic."""
+    """Long-only EMA crossover with RSI filter; fills at the open of t on signals from t-1, with costs."""
     closes = [c.close for c in candles]
     ema_f = _ema(closes, ema_fast)
     ema_s = _ema(closes, ema_slow)
     rsi = _rsi(closes, rsi_period)
+    atr = _atr(candles)
 
     equity = capital
     position = 0
@@ -155,7 +152,7 @@ def run_demo_backtest(
             elif ema_f[i - 1] < ema_s[i - 1]:
                 exit_price, reason = c.close, "crossunder"
             if exit_price is not None:
-                fill = exit_price * (1 - FEE_RATE)
+                fill = costs.sell_fill(exit_price, atr[i - 1], FEE_RATE)
                 pnl = qty * (fill - entry_price)
                 equity += pnl
                 trades.append(Trade(entry_ts, c.ts, "LONG", entry_price, exit_price, qty, pnl, reason))
@@ -164,7 +161,7 @@ def run_demo_backtest(
         if position == 0:
             crossed_up = ema_f[i - 1] > ema_s[i - 1] and ema_f[i - 2] <= ema_s[i - 2]
             if crossed_up and rsi[i - 1] > 50:
-                entry_price = c.open * (1 + FEE_RATE)
+                entry_price = costs.buy_fill(c.open, atr[i - 1], FEE_RATE)
                 stop_price = entry_price * 0.95
                 risk_amount = equity * risk_per_trade
                 per_unit_risk = entry_price - stop_price

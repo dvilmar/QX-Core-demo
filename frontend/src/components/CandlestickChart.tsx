@@ -51,7 +51,6 @@ export default function CandlestickChart({ candles }: { candles: Candle[] }) {
       chart.remove();
       chartRef.current = null;
     };
-    // re-create the chart whenever the candle set changes length (new backtest run etc.)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [candles.length]);
 

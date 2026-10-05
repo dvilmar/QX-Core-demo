@@ -37,7 +37,6 @@ export default function BacktestLab() {
     setResult(null);
     try {
       const { job_id } = await startBacktest(params);
-      // simple poll loop -- same async-job pattern as the live app
       for (let i = 0; i < 20; i++) {
         await new Promise((r) => setTimeout(r, 400));
         const status = await fetchBacktestStatus(job_id);

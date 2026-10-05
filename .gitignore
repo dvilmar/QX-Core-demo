@@ -9,3 +9,7 @@ __pycache__/
 *.log
 .DS_Store
 *.tsbuildinfo
+data/
+.pytest_cache/
+.ruff_cache/
+.coverage

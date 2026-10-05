@@ -1,5 +1,3 @@
-"""Pydantic response models for the API."""
-
 from datetime import datetime
 
 from pydantic import BaseModel
@@ -54,6 +52,18 @@ class BacktestParams(BaseModel):
 
 class JobStatusOut(BaseModel):
     job_id: str
-    status: str  # "running" | "done" | "error"
+    status: str
     result: dict | None = None
     error: str | None = None
+
+
+class RunOut(BaseModel):
+    id: int
+    created_at: str
+    kind: str
+    params: dict
+    result: dict
+
+
+class HaltRequest(BaseModel):
+    reason: str = "manual"
